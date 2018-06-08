@@ -112,7 +112,7 @@
             "Properties": {
                 "KeyName": { "Fn::FindInMap": ["CommonMap", { "Ref" : "AWS::Region" },"keypair"]}, 
                 "DisableApiTermination": "false",
-                "ImageId": { "Fn::FindInMap": ["ImagesMap", { "Ref" : "AWS::Region" },"Centos64"]},
+                "ImageId": { "Fn::FindInMap": ["ImagesMap", { "Ref" : "AWS::Region" },"Centos7x64"]},
                 "InstanceType": "t2.medium",
                 "Monitoring": "false",
                 "SecurityGroupIds": [
@@ -121,8 +121,8 @@
                 ],
                 "SubnetId" : { "Fn::FindInMap": ["CommonMap", { "Ref" : "AWS::Region" },"subnetPrivate"]},
                 "Tags": [
-                    { "Key": "Name","Value": "HDP server 1"},
-                    {"Key": "Dept","Value": "STUDN"}
+                    { "Key": "Role","Value": "HDP server 1"},
+
                 ]
                 
             }
