@@ -1,0 +1,139 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Stack to create servers  for testing",
+    "Parameters": {
+        "DefInsTypeParam": {
+            "Type": "String",
+            "Default": "t2.micro",
+            "AllowedValues": [
+                "t2.micro",
+                "m1.small",
+                "m1.large"
+            ]
+        }
+    },
+    "Mappings": {
+        "ImagesMap": {
+            "us-east-1" : { "AmzLinux32" : "-todefine-", "AmzLinux64" : "ami-1853ac65", "Centos7x64":"ami-d5bf2caa" }, 
+            "ap-southeast-1" : { "AmzLinux32" : "-todefine-", "AmzLinux64" : "ami-e2adf99e" , "Centos7x64":"ami-da6151a6"}
+        },
+
+
+        "CommonMap": {
+            "us-east-1": {
+                "keypair": "stu_bc2018",
+                "vpc": "vpc-7e4cce05",
+                "subnetPublic": "subnet-17182838",
+                "subnetPrivate": "subnet-301a2a1f",
+                "defaultSecGroup":"sg-633d7815",
+                "bastionHost":""
+
+            },
+            "ap-southeast-1": {
+                "keypair": "stu_bc2018",
+                "vpc": "vpc-a1a409c6",
+                "subnetPublic": "subnet-b26809fb",
+                "subnetPrivate": "subnet-1e077e57",
+                "defaultSecGroup":"sg-89ec15f0",
+                "bastionHost":"i-09fc52befd42d0758"
+            }
+        }
+
+
+        
+
+    },
+    "Conditions": {
+
+    },
+    "Resources": {
+        
+        "WebAccessSG" : {
+          "Type" : "AWS::EC2::SecurityGroup",
+          "Properties" : {
+            "GroupDescription" : "Allow access to HTTP/HTTPS",
+            "SecurityGroupIngress" : [ 
+                { "IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : "0.0.0.0/0" },
+                { "IpProtocol" : "tcp", "FromPort" : "443", "ToPort" : "443", "CidrIp" : "0.0.0.0/0" }
+            ],
+            "VpcId" : { "Fn::FindInMap": ["CommonMap", { "Ref" : "AWS::Region" },"vpc"]},
+            "Tags" :  [ 
+                { "Key": "Name","Value": "WebAccessSG"}
+            ]
+          }
+        },
+        
+
+        "Server1": {
+            "Type": "AWS::EC2::Instance",
+            "Properties": {
+                "KeyName": { "Fn::FindInMap": ["CommonMap", { "Ref" : "AWS::Region" },"keypair"]}, 
+                "DisableApiTermination": "false",
+                "ImageId": { "Fn::FindInMap": ["ImagesMap", { "Ref" : "AWS::Region" },"AmzLinux64"]},
+                "InstanceType": {"Ref":"DefInsTypeParam"},
+                "Monitoring": "false",
+                "SecurityGroupIds": [
+                    { "Fn::FindInMap": ["CommonMap", { "Ref" : "AWS::Region" },"defaultSecGroup"]},
+                    {"Ref":"WebAccessSG"}
+                ],
+                "SubnetId" : { "Fn::FindInMap": ["CommonMap", { "Ref" : "AWS::Region" },"subnetPrivate"]},
+                "Tags": [
+                    { "Key": "Name","Value": "Devops Srv1"},
+                    {"Key": "Dept","Value": "STUDN"}
+                ]
+                
+            }
+        }, 
+
+        "Server2": {
+            "Type": "AWS::EC2::Instance",
+            "Properties": {
+                "KeyName": { "Fn::FindInMap": ["CommonMap", { "Ref" : "AWS::Region" },"keypair"]}, 
+                "DisableApiTermination": "false",
+                "ImageId": { "Fn::FindInMap": ["ImagesMap", { "Ref" : "AWS::Region" },"AmzLinux64"]},
+                "InstanceType": {"Ref":"DefInsTypeParam"},
+                "Monitoring": "false",
+                "SecurityGroupIds": [
+                    { "Fn::FindInMap": ["CommonMap", { "Ref" : "AWS::Region" },"defaultSecGroup"]},
+                    {"Ref":"WebAccessSG"}
+                ],
+                "SubnetId" : { "Fn::FindInMap": ["CommonMap", { "Ref" : "AWS::Region" },"subnetPrivate"]},
+                "Tags": [
+                    { "Key": "Name","Value": "Devops Srv2"},
+                    {"Key": "Dept","Value": "STUDN"}
+                ]
+                
+            }
+        },
+
+
+         "Server3": {
+            "Type": "AWS::EC2::Instance",
+            "Properties": {
+                "KeyName": { "Fn::FindInMap": ["CommonMap", { "Ref" : "AWS::Region" },"keypair"]}, 
+                "DisableApiTermination": "false",
+                "ImageId": { "Fn::FindInMap": ["ImagesMap", { "Ref" : "AWS::Region" },"Centos64"]},
+                "InstanceType": "t2.medium",
+                "Monitoring": "false",
+                "SecurityGroupIds": [
+                    { "Fn::FindInMap": ["CommonMap", { "Ref" : "AWS::Region" },"defaultSecGroup"]},
+                    {"Ref":"WebAccessSG"}
+                ],
+                "SubnetId" : { "Fn::FindInMap": ["CommonMap", { "Ref" : "AWS::Region" },"subnetPrivate"]},
+                "Tags": [
+                    { "Key": "Name","Value": "HDP server 1"},
+                    {"Key": "Dept","Value": "STUDN"}
+                ]
+                
+            }
+        }
+    },
+    "Outputs": {
+            
+            "Server1IP" : {"Value" : {"Fn::GetAtt":["Server1","PrivateIp"]}},
+            "Server2IP" : {"Value" : {"Fn::GetAtt":["Server2","PrivateIp"]}},
+            "Server1InstanceId" : {"Value" : {"Ref":"Server1"}},
+            "Server2InstanceId" : {"Value" : {"Ref":"Server2"}}
+            
+    }
+}
