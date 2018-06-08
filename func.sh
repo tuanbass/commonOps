@@ -1,15 +1,7 @@
 #!/bin/bash 
 
+. .privateParam
 
-export TUANBA1_PC_STU=10.133.58.41
-export TUANBA1_PC_REC=10.133.12.152
-
-export OPEN_VPN_GW_INTERNAL=172.27.224.1
-export OPEN_VPN_GW_LISTEN_IF=5.230.194.41
-export OPEN_VPN_ADMIN_PORT=9943
-
-alias connectVPN='sudo openvpn --config  ~/.ssh/tuanba1.ovpn' 
-alias connectVPNSin='sudo openvpn --config  ~/.ssh/studn.ovpn' 
 
 
 function xxx(){
@@ -224,8 +216,9 @@ function openAsso(){
 }
 
 function xfree(){
-    user="tuanba1@fsoft.fpt.vn" 
-    pass="Ilumty135#"
+
+    user=$FSOFT_USER
+    pass=$FSOFT_USER
     drive=" "
     drive="$drive --drive home,/home/tuanba1"
     drive="$drive --drive share,/vol_share"
@@ -247,29 +240,7 @@ function xfree(){
 }
 
 
-function xfree_gpu_w(){
-    user="tuanba1@fsoft.fpt.vn" 
-    pass="Ilumty913#"
-    drive=" "
-    drive="$drive --drive home,/home/tuanba1"
-    drive="$drive --drive share,/vol_share"
-    drive="$drive --drive src,/src"
-    host=10.133.149.88
 
-    #drive=""
-
-    param=$1
-    echo $param 
-    if [[ a"$param" == a ]]; then 
-        w=1024
-        h=740
-    else
-        w=1366
-        h=720
-    fi
-    xfreerdp  -u $user -p $pass --bpp 32 -v $host  --disable-wallpaper --disable-themes \
-              -w $w -h $h --enable-clipboard $drive 
-}
 
 function syncdate(){
     sudo date -s "$(wget -S  "http://www.google.com/" 2>&1 | grep -E '^[[:space:]]*[dD]ate:' | sed 's/^[[:space:]]*[dD]ate:[[:space:]]*//' | head -1l | awk '{print $1, $3, $2,  $5 ,"GMT", $4 }' | sed 's/,//')"
