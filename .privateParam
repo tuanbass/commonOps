@@ -1,0 +1,10 @@
+export TUANBA1_PC_STU=10.133.58.41
+export TUANBA1_PC_REC=10.133.12.152
+
+export OPEN_VPN_GW_INTERNAL=172.27.224.1
+export OPEN_VPN_GW_LISTEN_IF=5.230.194.41
+export OPEN_VPN_ADMIN_PORT=9943
+export    FSOFT_USER="tuanba1@fsoft.fpt.vn"
+export    FSOFT_PASS="Ilumty135#"
+alias connectVPN='sudo openvpn --config  ~/.ssh/tuanba1.ovpn' 
+alias connectVPNSin='sudo openvpn --config  ~/.ssh/studn.ovpn' 
