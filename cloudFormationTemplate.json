@@ -70,7 +70,7 @@
                 "KeyName": { "Fn::FindInMap": ["CommonMap", { "Ref" : "AWS::Region" },"keypair"]}, 
                 "DisableApiTermination": "false",
                 "ImageId": { "Fn::FindInMap": ["ImagesMap", { "Ref" : "AWS::Region" },"AmzLinux64"]},
-                "InstanceType": {"Ref":"DefInsTypeParam"},
+                "InstanceType": "t2.micro",
                 "Monitoring": "false",
                 "SecurityGroupIds": [
                     { "Fn::FindInMap": ["CommonMap", { "Ref" : "AWS::Region" },"defaultSecGroup"]},
@@ -78,8 +78,8 @@
                 ],
                 "SubnetId" : { "Fn::FindInMap": ["CommonMap", { "Ref" : "AWS::Region" },"subnetPrivate"]},
                 "Tags": [
-                    { "Key": "Name","Value": "Devops Srv1"},
-                    {"Key": "Dept","Value": "STUDN"}
+                    { "Key": "role","Value": "ambri agent"},
+         
                 ]
                 
             }
@@ -91,7 +91,7 @@
                 "KeyName": { "Fn::FindInMap": ["CommonMap", { "Ref" : "AWS::Region" },"keypair"]}, 
                 "DisableApiTermination": "false",
                 "ImageId": { "Fn::FindInMap": ["ImagesMap", { "Ref" : "AWS::Region" },"AmzLinux64"]},
-                "InstanceType": {"Ref":"DefInsTypeParam"},
+                "InstanceType": "t2.small",
                 "Monitoring": "false",
                 "SecurityGroupIds": [
                     { "Fn::FindInMap": ["CommonMap", { "Ref" : "AWS::Region" },"defaultSecGroup"]},
@@ -99,15 +99,15 @@
                 ],
                 "SubnetId" : { "Fn::FindInMap": ["CommonMap", { "Ref" : "AWS::Region" },"subnetPrivate"]},
                 "Tags": [
-                    { "Key": "Name","Value": "Devops Srv2"},
-                    {"Key": "Dept","Value": "STUDN"}
+                    { "Key": "role","Value": "ambri agent"},  
+
                 ]
                 
             }
         },
 
 
-         "Server3": {
+        "Server3": {
             "Type": "AWS::EC2::Instance",
             "Properties": {
                 "KeyName": { "Fn::FindInMap": ["CommonMap", { "Ref" : "AWS::Region" },"keypair"]}, 
@@ -121,13 +121,69 @@
                 ],
                 "SubnetId" : { "Fn::FindInMap": ["CommonMap", { "Ref" : "AWS::Region" },"subnetPrivate"]},
                 "Tags": [
-                    { "Key": "Role","Value": "HDP server 1"},
+                    { "Key": "role","Value": "Ambri master"}
+
+                ]
+                
+            },
+        },
+
+        "Server4": {
+            "Type": "AWS::EC2::Instance",
+            "Properties": {
+                "KeyName": { "Fn::FindInMap": ["CommonMap", { "Ref" : "AWS::Region" },"keypair"]}, 
+                "DisableApiTermination": "false",
+                "ImageId": { "Fn::FindInMap": ["ImagesMap", { "Ref" : "AWS::Region" },"Centos7x64"]},
+                "InstanceType": "t2.medium",
+                "Monitoring": "false",
+                "SecurityGroupIds": [
+                    { "Fn::FindInMap": ["CommonMap", { "Ref" : "AWS::Region" },"defaultSecGroup"]},
+                    {"Ref":"WebAccessSG"}
+                ],
+                "SubnetId" : { "Fn::FindInMap": ["CommonMap", { "Ref" : "AWS::Region" },"subnetPrivate"]},
+                "BlockDeviceMappings" : [
+                    {
+                        "DeviceName" : "/dev/xvda",
+                        "Ebs" : { "VolumeSize" : "32" } 
+                    }
+                ],
+                "Tags": [
+                    { "Key": "role","Value": "Ambri agent 1"}
 
                 ]
                 
             }
+        }, 
+        "SpotFleet": {
+            "Type": "AWS::EC2::SpotFleet",
+            "Properties": {
+                "SpotFleetRequestConfigData": {
+                    "TargetCapacity": 3,
+                    "IamFleetRole": "arn:aws:iam::277204057549:role/aws-ec2-spot-fleet-tagging-role",
+                    "LaunchSpecifications": [
+                        {
+                            "ImageId": { "Fn::FindInMap": ["ImagesMap", { "Ref" : "AWS::Region" },"Centos7x64"]},
+                            "KeyName": { "Fn::FindInMap": ["CommonMap", { "Ref" : "AWS::Region" },"keypair"]},
+                            "SecurityGroups": [
+                                {
+                                    "GroupId": { "Fn::FindInMap": ["CommonMap", { "Ref" : "AWS::Region" },"defaultSecGroup"]}
+                                }
+                            ],
+                            "InstanceType": "m3.medium",
+                            "SubnetId" : { "Fn::FindInMap": ["CommonMap", { "Ref" : "AWS::Region" },"subnetPrivate"]},
+                            "SpotPrice": "0.015",
+                            "IamInstanceProfile": {
+                                "Arn": "arn:aws:iam::123456789012:instance-profile/my-iam-role"
+                            }
+                        }
+                    ]
+                }
+            }
         }
     },
+
+
+
     "Outputs": {
             
             "Server1IP" : {"Value" : {"Fn::GetAtt":["Server1","PrivateIp"]}},

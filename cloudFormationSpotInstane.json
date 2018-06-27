@@ -1,0 +1,84 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Stack to create servers  for testing",
+    "Parameters": {
+        "DefInsTypeParam": {
+            "Type": "String",
+            "Default": "t2.micro",
+            "AllowedValues": [
+                "t2.micro",
+                "m1.small",
+                "m1.large"
+            ]
+        }
+    },
+    "Mappings": {
+        "ImagesMap": {
+            "us-east-1" : { "AmzLinux32" : "-todefine-", "AmzLinux64" : "ami-1853ac65", "Centos7x64":"ami-d5bf2caa" }, 
+            "ap-southeast-1" : { "AmzLinux32" : "-todefine-", "AmzLinux64" : "ami-e2adf99e" , "Centos7x64":"ami-da6151a6", "Ubuntu1604x64":"ami-81cefcfd"}
+        },
+
+
+        "CommonMap": {
+            "us-east-1": {  
+                "keypair": "stu_bc2018",
+                "vpc": "vpc-7e4cce05",
+                "subnetPublic": "subnet-17182838",
+                "subnetPrivate": "subnet-301a2a1f",
+                "defaultSecGroup":"sg-633d7815",
+                "bastionHost":""
+
+            },
+            "ap-southeast-1": {
+                "keypair": "stu_bc2018",
+                "vpc": "vpc-a1a409c6",
+                "subnetPublic": "subnet-b26809fb",
+                "subnetPrivate": "subnet-1e077e57",
+                "defaultSecGroup":"sg-89ec15f0",
+                "bastionHost":"i-09fc52befd42d0758"
+            }
+        }
+
+
+        
+
+    },
+    "Conditions": {
+
+    },
+    "Resources": {
+        
+        "SpotFleet": {
+            "Type": "AWS::EC2::SpotFleet",
+            "Properties": {
+                "SpotFleetRequestConfigData": {
+                    "TargetCapacity": 3,
+                    "IamFleetRole": "arn:aws:iam::277204057549:role/aws-ec2-spot-fleet-tagging-role",
+                    "LaunchSpecifications": [
+                        {
+                            "ImageId": { "Fn::FindInMap": ["ImagesMap", { "Ref" : "AWS::Region" },"Ubuntu1604x64"]},
+                            "KeyName": { "Fn::FindInMap": ["CommonMap", { "Ref" : "AWS::Region" },"keypair"]},
+                            "SecurityGroups": [
+                                {
+                                    "GroupId": { "Fn::FindInMap": ["CommonMap", { "Ref" : "AWS::Region" },"defaultSecGroup"]}
+                                }
+                            ],
+                            "InstanceType": "m3.large",
+                            "SubnetId" : { "Fn::FindInMap": ["CommonMap", { "Ref" : "AWS::Region" },"subnetPrivate"]},
+                            "SpotPrice": "0.015",
+                            "IamInstanceProfile": {
+                                "Arn": "arn:aws:iam::123456789012:instance-profile/my-iam-role"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    },
+
+
+
+    "Outputs": {
+            
+    }
+}

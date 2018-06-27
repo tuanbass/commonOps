@@ -1,7 +1,11 @@
 #!/bin/bash 
 
-. .privateParam
+. /src/ops/.privateParam
 
+#alias internetIP='curl ifconfig.co; curl ifconfig.co/country'
+alias internetIP='curl ifconfig.co/json 2>null|jq'
+
+alias sqlplus="rlwrap sqlplus"
 
 
 function xxx(){
@@ -218,7 +222,7 @@ function openAsso(){
 function xfree(){
 
     user=$FSOFT_USER
-    pass=$FSOFT_USER
+    pass=$FSOFT_PASS
     drive=" "
     drive="$drive --drive home,/home/tuanba1"
     drive="$drive --drive share,/vol_share"
@@ -362,6 +366,8 @@ function addLocale_ja(){
     sudo echo "ja_JP.EUC-JP EUC-JP" >>/var/lib/locales/supported.d/ja
     sudo dpkg-reconfigure locales
 }
+
+
 
 ### autossh 10.133.58.41 -p 3389 -o ConnectTimeout=10 -N -L2345:10.16.133.144:2345 -i /home/tuanba1/.ssh/tuanba1.stu.pem 
 ### autossh localhost -p 2345 -o ConnectTimeout=10 -N -L1521:atoos-redesign-oracle-28.clbtbmobtpwq.ap-northeast-1.rds.amazonaws.com:1521 
