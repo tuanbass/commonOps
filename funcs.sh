@@ -367,7 +367,16 @@ function addLocale_ja(){
     sudo dpkg-reconfigure locales
 }
 
+PS1="\e[01;32m\\u@\\h\e[m\e[01;34m \\w\e[m\$(__git_ps1)\n$"
+/usr/bin/setxkbmap -option "caps:swapescape"
 
+function bindKey(){
+    #vs code
+    ln -s /src/ops/vscode_keybindings.json ~/.config/Code/User/keybindings.json
+    ln -s /src/ops/vscode_settings.json ~/.config/Code/User/settings.json
+
+
+}
 
 ### autossh 10.133.58.41 -p 3389 -o ConnectTimeout=10 -N -L2345:10.16.133.144:2345 -i /home/tuanba1/.ssh/tuanba1.stu.pem 
 ### autossh localhost -p 2345 -o ConnectTimeout=10 -N -L1521:atoos-redesign-oracle-28.clbtbmobtpwq.ap-northeast-1.rds.amazonaws.com:1521 
